@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nick & Lauren - 5th Anniversary</title>
+    <style>
+        /* ===== MODERN CUSTOMIZATION VARIABLES ===== */
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #151520;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --accent-tertiary: #f59e0b;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: radial-gradient(ellipse at center, var(--secondary-bg) 0%, var(--primary-bg) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ===== PASSWORD PROTECTION OVERLAY ===== */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-bg);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .password-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .password-container h2 {
+            margin-bottom: 16px;
+            color: var(--accent-primary);
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .password-container p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 32px;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding: 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 16px;
+            margin: 24px 0;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .password-container input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .password-container input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .password-container button {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .password-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 212, 255, 0.3);
+        }
+
+        .error-message {
+            color: #ef4444;
+            margin-top: 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-weight: 500;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 4s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .floating-object {
+            position: fixed;
+            right: -200px;
+            top: 15%;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            33% { transform: translateY(-30px) translateX(-20px); }
+            66% { transform: translateY(20px) translateX(10px); }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            display: none;
+        }
+
+        header {
+            text-align: center;
+            padding: 120px 20px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.2) 100%);
+            margin-bottom: 80px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.25rem, 4vw, 2.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: -0.01em;
+        }
+
+        .hero-details {
+            font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+            color: var(--text-primary);
+            font-weight: 500;
+            margin: 32px 0;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-top: 60px;
+        }
+
+        .countdown-item {
+            background: var(--glass-bg);
+            padding: 32px 24px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            min-width: 100px;
+            transition: transform 0.3s ease;
+        }
+
+        .countdown-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* ===== NAVIGATION ===== */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 20px 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-link:hover {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 20px;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            text-align: center;
+            margin-bottom: 80px;
+            color: var(--accent-primary);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .event-details {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            padding: 60px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 80px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .event-item {
+            text-align: center;
+            padding: 40px 32px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .event-item:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-primary);
+        }
+
+        .event-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .event-item h3 {
+            color: var(--accent-primary);
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .event-item p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .timeline-item {
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .timeline-content {
+            background: var(--glass-bg);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            width: 45%;
+            position: relative;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 55%;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-right: 55%;
+        }
+
+        .timeline-year {
+            color: var(--accent-primary);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .timeline-content h3 {
+            color: var(--text-primary);
+            font-size: 1.375rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .timeline-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            top: 40px;
+            border: 4px solid var(--primary-bg);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        /* ===== GALLERY ===== */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px dashed var(--glass-border);
+            backdrop-filter: blur(20px);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ===== RSVP SECTION ===== */
+        .rsvp-form {
+            background: var(--glass-bg);
+            padding: 60px;
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--accent-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 212, 255, 0.3);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .floating-object {
+                display: none;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-content {
+                width: calc(100% - 60px);
+                margin-left: 60px !important;
+                margin-right: 0 !important;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+
+            .countdown {
+                gap: 16px;
+            }
+
+            .countdown-item {
+                padding: 24px 16px;
+                min-width: 80px;
+            }
+
+            .event-details,
+            .rsvp-form {
+                padding: 40px 32px;
+            }
+
+            .section {
+                padding: 80px 20px;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 12px;
+        }
+
+        footer .signature {
+            color: var(--accent-primary);
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="stars" id="stars"></div>
+    <div class="floating-object"></div>
+
+    <!-- Password Protection Overlay -->
+    <div id="password-overlay">
+        <div class="password-container">
+            <h2>Access Required</h2>
+            <p>Enter the access code to continue</p>
+            <input type="password" id="password-input" placeholder="Enter code" autocomplete="off">
+            <button onclick="checkPassword()">Continue</button>
+            <div class="error-message" id="error-message">Access denied. Please try again.</div>
+        </div>
+    </div>
+
+    <!-- Main Website Content -->
+    <div class="main-content" id="main-content">
+        <!-- Hero Section -->
+        <header id="home">
+            <h1 class="hero-title">Nick & Lauren</h1>
+            <p class="hero-subtitle">Five Years Together</p>
+            <p class="hero-details">Houston, Texas • May 1-2, 2026</p>
+            
+            <!-- Countdown Timer -->
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <div class="countdown-number" id="days">000</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="hours">00</div>
+                    <div class="countdown-label">Hours</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="minutes">00</div>
+                    <div class="countdown-label">Minutes</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="seconds">00</div>
+                    <div class="countdown-label">Seconds</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav>
+            <div class="nav-container">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#details" class="nav-link">Details</a>
+                <a href="#journey" class="nav-link">Our Story</a>
+                <a href="#gallery" class="nav-link">Gallery</a>
+                <a href="#rsvp" class="nav-link">RSVP</a>
+            </div>
+        </nav>
+
+        <!-- Event Details Section -->
+        <section id="details" class="section">
+            <h2 class="section-title">Event Details</h2>
+            <div class="event-details">
+                <div class="event-grid">
+                    <div class="event-item">
+                        <div class="event-icon">📅</div>
+                        <h3>Date</h3>
+                        <p>May 1-2, 2026<br>Weekend celebration</p>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon">📍</div>
+                        <h3>Location</h3>
+                        <p>Space Center Houston<br>1601 E NASA Parkway<br>Houston, TX 77058</p>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon">🎯</div>
+                        <h3>Celebration</h3>
+                        <p>5th Anniversary<br>Space Center experience</p>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon">👥</div>
+                        <h3>Guests</h3>
+                        <p>Family & close friends<br>Invitation only</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Journey Timeline -->
+        <section id="journey" class="section">
+            <h2 class="section-title">Our Journey</h2>
+            <div class="timeline">
+                <!-- INSTRUCTION: Add more timeline items by copying this structure -->
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2021</div>
+                        <h3>The Beginning</h3>
+                        <p>Where it all started - the foundation of our journey together.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2022</div>
+                        <h3>Year One</h3>
+                        <p>Learning, growing, and building our life together.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2023</div>
+                        <h3>Deepening Bonds</h3>
+                        <p>Strengthening our connection and shared experiences.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2024</div>
+                        <h3>New Chapters</h3>
+                        <p>Embracing new opportunities and challenges as a team.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2025</div>
+                        <h3>Present</h3>
+                        <p>Continuing to evolve and support each other's dreams.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2026</div>
+                        <h3>Five Years</h3>
+                        <p>Celebrating this milestone with the people who matter most.</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="section">
+            <h2 class="section-title">Gallery</h2>
+            <div class="gallery-grid">
+                <!-- INSTRUCTION: Replace these placeholders with actual photos using <img> tags -->
+                <div class="gallery-item">+</div>
+                <div class="gallery-item">+</div>
+                <div class="gallery-item">+</div>
+                <div class="gallery-item">+</div>
+                <div class="gallery-item">+</div>
+                <div class="gallery-item">+</div>
+                <div class="gallery-item">+</div>
+                <div class="gallery-item">+</div>
+            </div>
+        </section>
+
+        <!-- RSVP Section -->
+        <section id="rsvp" class="section">
+            <h2 class="section-title">RSVP</h2>
+            <div class="rsvp-form">
+                <form action="#" method="POST">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="guests">Number of Guests</label>
+                        <input type="number" id="guests" name="guests" min="1" max="10" placeholder="Including yourself">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Additional Information</label>
+                        <textarea id="message" name="message" rows="4" placeholder="Dietary restrictions, special requests, etc."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Confirm Attendance</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>Looking forward to celebrating with you</p>
+            <p class="signature">Nick & Lauren</p>
+        </footer>
+    </div>
+
+    <script>
+        // ===== PASSWORD PROTECTION =====
+        // CHANGE THE PASSWORD HERE:
+        const correctPassword = "nicklaurenanniversary";
+        
+        function checkPassword() {
+            const input = document.getElementById('password-input');
+            const error = document.getElementById('error-message');
+            
+            if (input.value === correctPassword) {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                createStars();
+                startCountdown();
+            } else {
+                error.style.opacity = '1';
+                input.value = '';
+                input.focus();
+                setTimeout(() => {
+                    error.style.opacity = '0';
+                }, 3000);
+            }
+        }
+
+        // Allow Enter key to submit password
+        document.getElementById('password-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // ===== ANIMATED STARS BACKGROUND =====
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 150;
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Random position
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // Random size
+                const size = Math.random() * 2 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                
+                // Random animation delay
+                star.style.animationDelay = Math.random() * 4 + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // ===== COUNTDOWN TIMER =====
+        function startCountdown() {
+            const eventDate = new Date('May 1, 2026 18:00:00').getTime();
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const timeLeft = eventDate - now;
+
+                if (timeLeft > 0) {
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    document.getElementById('days').textContent = days.toString().padStart(3, '0');
+                    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+                } else {
+                    document.getElementById('countdown').innerHTML = '<div class="countdown-item"><div class="countdown-number">Live</div><div class="countdown-label">Event Active</div></div>';
+                }
+            }
+
+            updateCountdown();
